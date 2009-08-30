@@ -1,4 +1,9 @@
 import System.Random
+ndp = 4
+bround :: (RealFloat a, Integral b) => a -> b -> a
+bround x places = (fromIntegral (round ( x * exp))) / exp 
+       where exp = 10.0 ^ places
+
 limitedPoissonStream :: ( Random r, RealFloat r, RandomGen g) => r -> r -> r -> g -> [r]
 limitedPoissonStream rate start limit gen 
         | next > limit = [] 
@@ -11,17 +16,17 @@ countedPoissonStream rate start count gen
         | count <= 0 = [] 
         | otherwise     = next:(countedPoissonStream rate next (count-1) newGen)
         where  (rvalue, newGen) = random gen
-               next = start - log(rvalue) / rate  
+               next = bround (start - log(rvalue) / rate) ndp  
 
 infinitePoissonStream :: ( Random r, RealFloat r, RandomGen g) => r -> r -> g -> [r]
 infinitePoissonStream rate start gen = next:(infinitePoissonStream rate next newGen)
         where  (rvalue, newGen) = random gen
-               next = start - log(rvalue) / rate  
-
+               next = bround (start - log(rvalue) / rate) ndp
+               
 infinitePoissonValues :: ( Random r, RealFloat r, RandomGen g) => r -> g -> [r]
 infinitePoissonValues rate gen = next:(infinitePoissonValues rate newGen)
         where  (rvalue, newGen) = random gen
-               next = 0.0 - log(rvalue) / rate  
+               next = bround (0.0 - log(rvalue) / rate) ndp
 
 mmQueue :: (Random r, RealFloat r) => Int -> r -> r -> Int -> [(r,r)]
 mmQueue count arr serv seed = 
@@ -36,4 +41,4 @@ ieventLog start end [] = []
 ieventLog start end (q:qs) = (arr, serv, newstart, newend) : (ieventLog newstart newend qs) where
           (arr, serv) = q
           newstart = max end arr
-          newend = newstart + serv
+          newend = bround (newstart + serv) ndp
