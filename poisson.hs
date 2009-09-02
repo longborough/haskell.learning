@@ -1,8 +1,14 @@
 import System.Random
+import Numeric
+
+main = do
+    putStrLn (show (eventLog ( mmQueue 100 0.15 0.52 2841267 ) ) )
+
 ndp = 4
 bround :: (RealFloat a, Integral b) => a -> b -> a
-bround x places = (fromIntegral (round ( x * exp))) / exp 
-       where exp = 10.0 ^ places
+--bround x places = (fromIntegral (round ( x * exp))) / exp 
+--       where exp = 10.0 ^ places
+bround x places = x
 
 limitedPoissonStream :: ( Random r, RealFloat r, RandomGen g) => r -> r -> r -> g -> [r]
 limitedPoissonStream rate start limit gen 
@@ -33,12 +39,27 @@ mmQueue count arr serv seed =
         zip ( countedPoissonStream arr 0.0 count (mkStdGen seed) ) 
             (infinitePoissonValues serv ( mkStdGen (seed+93141) ) )
 
-eventLog :: (Random r, RealFloat r) => [(r,r)] -> [(r,r,r,r)]
-eventLog queue = ieventLog 0.0 0.0 queue
+eventLog :: (Random r, RealFloat r) => [(r,r)] -> [(r,r,r,r,r,r)]
+eventLog queue = ieventLog 0.0 queue
 
-ieventLog :: (Random r, RealFloat r) => r -> r -> [(r,r)] -> [(r,r,r,r)]
-ieventLog start end [] = []
-ieventLog start end (q:qs) = (arr, serv, newstart, newend) : (ieventLog newstart newend qs) where
-          (arr, serv) = q
-          newstart = max end arr
-          newend = bround (newstart + serv) ndp
+ieventLog :: (Random r, RealFloat r) => r -> [(r,r)] -> [(r,r,r,r,r,r)]
+ieventLog start [] = []
+ieventLog start (q:qs) = (tarr, twait, transit, sidle, sstart, sserv) : (ieventLog newstart qs) where
+          (tarr, sserv) = q
+          sstart = max start tarr
+          sidle = bround(sstart - start) ndp
+          twait = bround (sstart - tarr) ndp
+          transit = bround (twait + sserv) ndp
+          newstart = bround (sstart + sserv) ndp
+
+printAll :: (Random r, RealFloat r) => [(r,r,r,r,r,r)] -> IO ()
+printAll []     = return ()
+printAll (x:xs) = do putStrLn (showX x)
+                     printAll xs          
+
+show4 x = showFFloat (Just 4) x ","
+
+showX :: (Random r, RealFloat r) => (r,r,r,r,r,r) -> String
+showX x = (show4 a) ++ (show4 b) ++ (show4 c) ++ (show4 d) ++ (show4 e) ++ (show4 f) where
+      (a,b,c,d,e,f) = x
+            
