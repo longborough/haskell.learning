@@ -1,14 +1,11 @@
 import System.Random
 import Numeric
 
-main = do
-    putStrLn (show (eventLog ( mmQueue 100 0.15 0.52 2841267 ) ) )
-
 ndp = 4
 bround :: (RealFloat a, Integral b) => a -> b -> a
---bround x places = (fromIntegral (round ( x * exp))) / exp 
---       where exp = 10.0 ^ places
-bround x places = x
+bround x places = (fromIntegral (round ( x * exp))) / exp 
+       where exp = 10.0 ^ places
+--bround x places = x
 
 limitedPoissonStream :: ( Random r, RealFloat r, RandomGen g) => r -> r -> r -> g -> [r]
 limitedPoissonStream rate start limit gen 
@@ -34,7 +31,7 @@ infinitePoissonValues rate gen = next:(infinitePoissonValues rate newGen)
         where  (rvalue, newGen) = random gen
                next = bround (0.0 - log(rvalue) / rate) ndp
 
-mmQueue :: (Random r, RealFloat r) => Int -> r -> r -> Int -> [(r,r)]
+mmQueue :: Int -> Double -> Double -> Int -> [(Double,Double)]
 mmQueue count arr serv seed = 
         zip ( countedPoissonStream arr 0.0 count (mkStdGen seed) ) 
             (infinitePoissonValues serv ( mkStdGen (seed+93141) ) )
@@ -62,4 +59,7 @@ show4 x = showFFloat (Just 4) x ","
 showX :: (Random r, RealFloat r) => (r,r,r,r,r,r) -> String
 showX x = (show4 a) ++ (show4 b) ++ (show4 c) ++ (show4 d) ++ (show4 e) ++ (show4 f) where
       (a,b,c,d,e,f) = x
-            
+
+main = do
+       printAll (eventLog ( mmQueue 100 0.15 0.52 2841267 ) ) 
+
