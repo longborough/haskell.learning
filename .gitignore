@@ -1,4 +1,8 @@
 *.o
 *.exe
 *.hi
+examples/
+*.pdf
+*.csv
+*.zip
 
