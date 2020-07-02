@@ -1,0 +1,1 @@
+Graphics.Gnuplot.Simple.plotList [] [1..5]
