@@ -1,3 +1,4 @@
+module Isqrt (isqrt, isqrem) where
 import Data.Bits
 
 -- ===========================================================
@@ -15,8 +16,17 @@ bitmatch n b
 --      x == root*root + remainder
 --      x < (root+1) * (root+1)
 -- -----------------------------------------------------------
-isqrt :: (Integral a, Ord a, Bits a) => a -> (a,a)
-isqrt x = sqriter x 0 (bitmatch x 1)
+isqrem :: (Integral a, Ord a, Bits a) => a -> (a,a)
+isqrem x = sqriter x 0 (bitmatch x 1)
+
+-- ===========================================================
+-- Top-level square root function, uses sqriter as a helper
+-- Returns root (without remainder)
+-- For isqrt x,
+--      root * root <= x < (root+1) * (root+1)
+-- -----------------------------------------------------------
+isqrt :: (Integral a, Ord a, Bits a) => a -> a
+isqrt = fst . isqrem
 
 -- ===========================================================
 -- Iterative-Recursive square root finder
@@ -44,5 +54,3 @@ printem (x:xs) = do
     printem xs
 
 -- ===========================================================
-main = do
-    printem (map isqrt [1,4..40])

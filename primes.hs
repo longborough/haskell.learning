@@ -1,28 +1,30 @@
-import Data.Bits
+import Isqrt
 
-plist = 0 : 2 : 1 : cycle [2,2,4,2,4,2,4,6,2,6]
-
-bitmatch :: (Ord a, Bits a) => a -> a -> a
-bitmatch n b
-    | n < b = b
-    | otherwise = bitmatch n (shift b 2)
-
-isqrt :: (Integral a, Ord a, Bits a) => a -> (a,a)
-isqrt x = sqriter x x 0 (bitmatch x 1)
-
-sqriter :: (Integral a, Ord a, Bits a) => a -> a -> a -> a -> (a,a)
-sqriter i residue root obit
-    | obit < 1 = (root,residue)
-    | otherwise = sqriter i nres (shiftR nroot 1) (shiftR obit 2) where
-        x = root + obit
-        nres = if residue >= x then (residue - x) else residue
-        nroot = if residue >= x then (x + obit) else root
-
-printem :: [(Int, Int)] -> IO ()
+printem ::  [Int] -> IO ()
 printem [] = return ()
 printem (x:xs) = do
-    putStrLn(showInt(fst x) ++ " " + showInt(snd x))
+    print x 
     printem xs
 
-main = do
-    printem map isqrt [1..20]
+dlist = 2 : 1 : cycle [2,2,4,2,4,2,4,6,2,6]
+plist = scanl1 (+) dlist
+
+isr0 :: Int -> Int -> Bool
+isr0 n d = 0 == (rem n d)
+
+isprime :: Int -> Bool
+isprime x = p where
+    p = not . firsttrue $ map (isr0 x) ( upto (isqrt x) [] plist ) 
+    
+firsttrue :: [Bool] -> Bool
+firsttrue [] = False
+firsttrue (x:xs) = x || (firsttrue xs)
+
+upto :: Int -> [Int] -> [Int] -> [Int]
+upto _ _ [] = []
+upto n r (x:xs)
+    | x > n = r
+    | otherwise = upto n (r ++ [x]) xs
+
+l = filter isprime plist
+z = zip (tail plist) plist
