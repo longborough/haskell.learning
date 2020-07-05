@@ -1,13 +1,12 @@
 module Isqrt (isqrt, isqrem) where
-import Data.Bits
 
 -- ===========================================================
 -- Shifts a 1 bit up until greater than a value n
 -- -----------------------------------------------------------
-bitmatch :: (Ord a, Bits a) => a -> a -> a
+bitmatch ::  Integer -> Integer -> Integer
 bitmatch n b
     | n < b = b
-    | otherwise = bitmatch n (shift b 2)
+    | otherwise = bitmatch n (b * 4)
 
 -- ===========================================================
 -- Top-level square root function, uses sqriter as a helper
@@ -16,7 +15,7 @@ bitmatch n b
 --      x == root*root + remainder
 --      x < (root+1) * (root+1)
 -- -----------------------------------------------------------
-isqrem :: (Integral a, Ord a, Bits a) => a -> (a,a)
+isqrem :: Integer -> (Integer,Integer)
 isqrem x = sqriter x 0 (bitmatch x 1)
 
 -- ===========================================================
@@ -25,7 +24,7 @@ isqrem x = sqriter x 0 (bitmatch x 1)
 -- For isqrt x,
 --      root * root <= x < (root+1) * (root+1)
 -- -----------------------------------------------------------
-isqrt :: (Integral a, Ord a, Bits a) => a -> a
+isqrt ::  Integer -> Integer
 isqrt = fst . isqrem
 
 -- ===========================================================
@@ -34,10 +33,10 @@ isqrt = fst . isqrem
 -- root:        Initially zero, develops with progress
 -- onebit:      A single bit, starts at high end, shifts down with progress
 -- -----------------------------------------------------------
-sqriter :: (Integral a, Ord a, Bits a) => a -> a -> a -> (a,a)
+sqriter :: Integer -> Integer -> Integer -> (Integer,Integer)
 sqriter remainder root onebit
     | onebit < 1 = (root,remainder)
-    | otherwise = sqriter nres (shiftR nroot 1) (shiftR onebit 2) where
+    | otherwise = sqriter nres (div nroot 2) (div onebit 4) where
         try = root + onebit
         nres = if remainder >= try then (remainder - try) else remainder
         nroot = if remainder >= try then (try + onebit) else root
