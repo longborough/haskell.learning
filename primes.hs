@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 import Isqrt
 
-printem ::  [(Integer,[Integer])] -> IO ()
+printem ::  Show a => [a] -> IO ()
 printem [] = return ()
 printem (x:xs) = do
     print x 
@@ -10,11 +10,11 @@ printem (x:xs) = do
 -- ===========================================================
 -- Two useful lists
 -- dlist:   List of increments between possible primes
--- plist:   Running total = list of possible primes
+-- plist:   Running total = list of possible primes (all prime to 2,3,5,7) 
 -- x is prime => x is a member of plist 
 -- -----------------------------------------------------------
-dlist = 2 : 1 : 2 : 2 : cycle [4,2,4,2,4,6,2,6]
---      2,1,2,2,4,2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,8]
+dlist = 2 : 1 : 2 : 2 : 4 : 
+ cycle [2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,8,6,4,6,2,4,6,2,6,6,4,2,4,6,2,6,4,2,4,2,10,2,10]
 plist = scanl1 (+) dlist
 
 -- ===========================================================
@@ -34,7 +34,7 @@ instance PrimeTo ([Integer]) where
 -- -----------------------------------------------------------
 isprime :: Integer -> Bool
 isprime x = p where
-    p = firstfalse $ map (ispt x) ( upto (isqrt x) [] plist ) 
+    p = firstfalse $ map (ispt x) (takeWhile (<= (isqrt x)) plist) 
 
 -- ===========================================================
 -- Searches a finite list for the first False value
@@ -84,7 +84,8 @@ z = zip (tail plist) plist
     
     
 main = do
-    printem $ zip [1..100] ( map factor [1..100] )
+    printem $ filter isprime  [7654321.. 7655521] 
+    -- printem $ zip [1..100] ( map factor [1..100] )
     -- printem $ take 400 $ zip (delve [2,3,5,7,11]) (scanl1 (+) $ delve [2,3,5,7,11])
     -- print $ factor $ 2147483647
     
