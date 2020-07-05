@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 import Isqrt
 
 printem ::  Show a => [a] -> IO ()
@@ -23,11 +22,10 @@ plist = scanl1 (+) dlist
 -- -----------------------------------------------------------
 class PrimeTo a where
     ispt :: Integer -> a -> Bool
-instance PrimeTo (Integer) where
+instance PrimeTo Integer where
     ispt n d = 0 /= (rem n d)
-instance PrimeTo ([Integer]) where
-    ispt n [] = True
-    ispt n (x:xs) = (ispt n x) && (ispt n xs)
+instance PrimeTo a => PrimeTo [a] where
+    ispt n = all (ispt n)
 
 -- ===========================================================
 -- Tests if a number is prime
@@ -84,7 +82,7 @@ z = zip (tail plist) plist
     
     
 main = do
-    printem $ filter isprime  [7654321.. 7655521] 
+    printem $ filter isprime  [2222222.. 3333333] 
     -- printem $ zip [1..100] ( map factor [1..100] )
     -- printem $ take 400 $ zip (delve [2,3,5,7,11]) (scanl1 (+) $ delve [2,3,5,7,11])
     -- print $ factor $ 2147483647
