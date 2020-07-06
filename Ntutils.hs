@@ -1,5 +1,5 @@
 module Ntutils (
-       iSqrt, iSqrem, isPrTo, isPrime, firstFalse, firstTrue, primeFactors
+       iSqrt, iSqrem, isPrTo, isPrime, firstFalse, firstTrue, primeFactors, primeList
        ) where
 
 -- ===========================================================
@@ -11,6 +11,7 @@ module Ntutils (
 dlist = 2 : 1 : 2 : 2 : 4 :
  cycle [2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,8,6,4,6,2,4,6,2,6,6,4,2,4,6,2,6,4,2,4,2,10,2,10]
 plist = scanl1 (+) dlist
+primeList = filter isPrime plist
 
 -- ===========================================================
 -- Tests if a number is prime to a single divisor
@@ -70,8 +71,7 @@ srqhelper remainder root onebit
 -- Tests if a number is prime
 -- -----------------------------------------------------------
 isPrime :: Integer -> Bool
-isPrime x = p where
-    p =  firstFalse $ map (isPrTo x) (takeWhile (<= (iSqrt x)) plist)
+isPrime x = firstFalse $ map (isPrTo x) (takeWhile (<= (iSqrt x)) plist)
 
 -- ===========================================================
 -- Searches a finite list for the first False value
