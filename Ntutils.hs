@@ -64,8 +64,10 @@ srqhelper remainder root onebit
     | otherwise = error "Attempting to take square root of negative Integer"
         where
             try = root + onebit
-            newrem = if remainder >= try then (remainder - try) else remainder
-            newroot = if remainder >= try then (try + onebit) else root
+            (newrem, newroot) =
+                if remainder >= try
+                    then ((remainder - try), (try + onebit))
+                    else (remainder, root)
 
 -- ===========================================================
 -- Tests if a number is prime
