@@ -64,16 +64,15 @@ srqhelper remainder root onebit
     | otherwise = error "Attempting to take square root of negative Integer"
         where
             try = root + onebit
-            (newrem, newroot) =
-                if remainder >= try
-                    then ((remainder - try), (try + onebit))
-                    else (remainder, root)
+            (newrem, newroot) = case (remainder >= try) of 
+                True  -> ((remainder - try), (try + onebit))
+                False -> (remainder, root)
 
 -- ===========================================================
 -- Tests if a number is prime
 -- -----------------------------------------------------------
 isPrime :: Integer -> Bool
-isPrime x = firstFalse $ map (isPrTo x) (takeWhile (<= (iSqrt x)) plist)
+isPrime x = firstFalse $ isPrTo x <$> takeWhile (<= (iSqrt x)) plist
 
 -- ===========================================================
 -- Searches a finite list for the first False value
